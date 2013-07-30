@@ -1,0 +1,180 @@
+<?php
+/**
+ * @file
+ * Modulo j2h
+ */
+
+/**
+ * Implementa hook_menu().
+ */
+function j2h_menu() {
+    
+    //$url = explode('j2h/', request_uri());
+
+    //$url = explode('?', $url[1]);
+
+    //$mod = $url[0];
+    
+    $items['j2h'] = array(
+        'page callback' => 'j2h',
+        'access callback' => TRUE,
+        'type' => MENU_CALLBACK,
+    );
+    
+    $items['admin/config/content/j2h'] = array(
+        'title' => 'Json 2 Human',
+        'description' => 'Configurar las opciones para j2h',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('j2h_configuracion'),
+        'access arguments' => array('administer site configuration'),
+        'file' => 'j2h.admin.inc',
+    );
+    
+    return $items;
+}
+
+function find_block_var($key, $block_vars) {
+
+    foreach (explode("\r\n", $block_vars) as $var) {
+        if (strpos($var, $key) !== false) {
+            $t = explode(':', $var);
+            
+            return $t[1];
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Callback que implementa la página: j2h/
+ */
+function j2h($mod_api='') {
+
+
+    $en_cache = 0;
+    $url_api_default = 'http://';
+
+    $use_cache = (empty($_SERVER['QUERY_STRING'])) ? false : true;
+
+    $cache_name = 'j2h_data';
+
+    $url_api = variable_get('j2h_api_url', $url_api_default);
+
+    if ($url_api == $url_api_default) {
+        return '<div>Defina la url de la api en Configuración:Content:Json 2 Human</div>';
+    }
+
+    // Api module
+    if (empty($mod_api)) {
+        
+        $block_vars = variable_get('j2h_block_vars');
+
+        if (drupal_is_front_page()) {
+            $page = 'front';
+        } 
+        else {
+            $url = explode('/',$_SERVER['REQUEST_URI']);
+
+            $page = $url[count($url) - 1];
+        }
+
+        $tm = find_block_var($page, $block_vars);
+
+        if ($tm === false) {
+            return '<div>No hay configuración de J2H para la página actual</div>';
+        }
+        else {
+            $mod_api = $tm;
+        }
+
+    }
+
+    $url_api .= '?mod='.$mod_api;
+
+    // Filters
+    $parse = parse_url($_SERVER['REQUEST_URI']);
+
+    if (!empty($_SERVER['QUERY_STRING'])) {
+        $url_api .= '&'.$_SERVER['QUERY_STRING'];
+    }
+
+    $json = drupal_http_request($url_api);
+
+    if (!empty($json->error)) {
+        return "<div>La api: <a href='$url_api' target='_blank'>$url_api</a> presenta el siguiente error: ".$json->error."</div>";
+    }
+
+    $json_data = drupal_json_decode($json->data);
+
+    /*
+    $json_data = &drupal_static(__FUNCTION__);
+    if (!isset($json_data)) {
+        if ($cache = cache_get($cache_name)) {
+            //$json_data = $cache->data;
+            $json_data = array();
+
+            $en_cache = 1;
+        }
+        else {
+            // Do your expensive calculations here, and populate $my_data
+            // with the correct stuff..
+            
+            cache_clear_all($cache_name, 'cache', TRUE);
+            
+            $url_api = 'http://sidih.colombiassh.org/sissh/api_portal.php?mod=contactos';
+            //$url_api = 'http://localhost/sissh/api_portal.php?mod='.$aaa;
+
+            $parse = parse_url($_SERVER['REQUEST_URI']);
+
+            if (!empty($_SERVER['QUERY_STRING'])) {
+                $url_api .= '&'.$_SERVER['QUERY_STRING'];
+            }
+
+            $json = drupal_http_request($url_api);
+
+            $json_data = drupal_json_decode($json->data);
+
+            cache_set($cache_name, $json_data, 'cache', time() + 86400);  // 1 day
+        }
+    }
+     */
+    
+    $variables = $json_data;
+    
+    return theme('j2h', $variables);
+}
+
+/**
+ * Implementa hook_theme().
+ */
+function j2h_theme() {
+
+    return array(
+        'j2h' => array(
+            'template' => 'j2h'
+        ),
+    );
+}
+
+/**
+ * Implementa hook_block_info().
+ */
+function j2h_block_info() {
+  $blocks['j2h'] = array(
+    'info' => 'Bloque para Json 2 Human',
+  );
+  return $blocks;
+}
+/**
+ * Implementa hook_block_view().
+ */
+function j2h_block_view($delta = '') {
+  switch ($delta) {
+    case 'j2h':
+      $block['content'] = j2h();
+      return $block;
+  }
+  break;
+}
+

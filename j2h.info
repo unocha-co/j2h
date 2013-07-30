@@ -1,0 +1,6 @@
+name = Json 2 human
+description = "Recibe data estructurada (generada por API's externas) y la muestra en listas, tablas, con filtros e interacción en 2 vias"
+package = Humanitarian Response
+core = 7.x
+scripts[] = j2h.js
+stylesheets[all][] = j2h.css
