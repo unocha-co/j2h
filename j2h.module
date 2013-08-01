@@ -36,7 +36,7 @@ function j2h_menu() {
 function find_block_var($key, $block_vars) {
 
     foreach (explode("\r\n", $block_vars) as $var) {
-        if (strpos($var, $key) !== false) {
+        if (strpos($var, $key) !== false && strpos(':',$var)) {
             $t = explode(':', $var);
             
             return $t[1];

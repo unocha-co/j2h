@@ -16,7 +16,7 @@ function j2h_configuracion() {
 
     $form['j2h_block_vars'] = array(
         '#title' => 'Block variables per page',
-        '#description' => 'Specify block variables by using their paths. Enter one path per line. front is the front page, i.e: <front>=>mod1_api, shelter=>mod2_api',
+        '#description' => 'Specify block variables by using their paths. Enter one path per line. front is the front page, i.e: <front>:mod1_api, shelter:mod2_api',
         '#type' => 'textarea',
         '#default_value' => variable_get('j2h_block_vars', ''),
     );
