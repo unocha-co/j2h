@@ -36,7 +36,7 @@ function j2h_menu() {
 function find_block_var($key, $block_vars) {
 
     foreach (explode("\r\n", $block_vars) as $var) {
-        if (strpos($var, $key) !== false && strpos(':',$var)) {
+        if (strpos($var, $key) !== false && strpos($var,':') !== false) {
             $t = explode(':', $var);
             
             return $t[1];
@@ -82,7 +82,7 @@ function j2h($mod_api='') {
         $tm = find_block_var($page, $block_vars);
 
         if ($tm === false) {
-            return '<div>No hay configuración de J2H para la página actual</div>';
+            return '<div>No hay configuración de J2H para la página actual('.$page.')</div>';
         }
         else {
             $mod_api = $tm;
