@@ -82,7 +82,10 @@ function j2h($mod_api='') {
         $tm = find_block_var($page, $block_vars);
 
         if ($tm === false) {
-            return '<div>No hay configuración de J2H para la página actual('.$page.')</div>';
+            return '<div>No hay configuración de J2H para la página actual('.$page.'), 
+                    en la configuración del módulo agregue una linea con el 
+                    siguiente formato:   '.$page.':mod_api, donde mod_api es 
+                    el modulo a consultar</div>';
         }
         else {
             $mod_api = $tm;
