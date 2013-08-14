@@ -97,6 +97,7 @@ function j2h($mod_api='') {
         $url_api .= '&'.$_SERVER['QUERY_STRING'];
     }
 
+    // For GET requests, the query has to be appended to the URL and not entered as the $data parameter
     $json = drupal_http_request($url_api);
 
     if (!empty($json->error)) {
