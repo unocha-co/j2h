@@ -1,19 +1,13 @@
 <?php
 /**
  * @file
- * Modulo j2h
+ * Json 2 Human Module
  */
 
 /**
- * Implementa hook_menu().
+ * hook_menu().
  */
 function j2h_menu() {
-    
-    //$url = explode('j2h/', request_uri());
-
-    //$url = explode('?', $url[1]);
-
-    //$mod = $url[0];
     
     $items['j2h'] = array(
         'page callback' => 'j2h',
@@ -33,7 +27,7 @@ function j2h_menu() {
     return $items;
 }
 
-function find_block_var($key, $block_vars) {
+function _j2h_find_block_var($key, $block_vars) {
 
     foreach (explode("\r\n", $block_vars) as $var) {
         if (strpos($var, $key) !== false && strpos($var,':') !== false) {
@@ -47,7 +41,7 @@ function find_block_var($key, $block_vars) {
 }
 
 /**
- * Callback que implementa la página: j2h/
+ * Callback
  */
 function j2h($mod_api='') {
 
@@ -62,7 +56,8 @@ function j2h($mod_api='') {
     $url_api = variable_get('j2h_api_url', $url_api_default);
 
     if ($url_api == $url_api_default) {
-        return '<div>Defina la url de la api en Configuración:Content:Json 2 Human</div>';
+        $msg = t("Please set the API url in the J2H configuration (Configuration->Content->Json 2 Human)");
+        return '<div>'.$msg.'</div>';
     }
 
     // Api module
@@ -79,13 +74,14 @@ function j2h($mod_api='') {
             $page = $url[count($url) - 1];
         }
 
-        $tm = find_block_var($page, $block_vars);
+        $tm = _j2h_find_block_var($page, $block_vars);
 
         if ($tm === false) {
-            return '<div>No hay configuración de J2H para la página actual('.$page.'), 
-                    en la configuración del módulo agregue una linea con el 
-                    siguiente formato:   '.$page.':mod_api, donde mod_api es 
-                    el modulo a consultar</div>';
+            $msg = t('There are not J2H settings for the current page(@page).
+                In the module configuration add a new line like this: @page:mod_api,
+                having mod_api like a module to query api', array('@page' => $page));
+
+            return '<div>'.$msg.'</div>';
         }
         else {
             $mod_api = $tm;
@@ -93,63 +89,31 @@ function j2h($mod_api='') {
 
     }
 
-    $url_api .= '?mod='.$mod_api;
+    $url_api_params = 'mod='.$mod_api;
 
     // Filters
     $parse = parse_url($_SERVER['REQUEST_URI']);
 
     if (!empty($_SERVER['QUERY_STRING'])) {
-        $url_api .= '&'.$_SERVER['QUERY_STRING'];
+        $url_api_params .= '&'.$_SERVER['QUERY_STRING'];
     }
-
-    $json = drupal_http_request($url_api);
+    
+    $json = drupal_http_request($url_api, array('data' => $url_api_params));
 
     if (!empty($json->error)) {
-        return "<div>La api: <a href='$url_api' target='_blank'>$url_api</a> presenta el siguiente error: ".$json->error."</div>";
+        $msg = t("The API: <a href='$url_api' target='_blank'>$url_api</a> shows this error: @error", array("@error" => $json->error));
+        return "<div>".$msg."</div>";
     }
 
     $json_data = drupal_json_decode($json->data);
 
-    /*
-    $json_data = &drupal_static(__FUNCTION__);
-    if (!isset($json_data)) {
-        if ($cache = cache_get($cache_name)) {
-            //$json_data = $cache->data;
-            $json_data = array();
-
-            $en_cache = 1;
-        }
-        else {
-            // Do your expensive calculations here, and populate $my_data
-            // with the correct stuff..
-            
-            cache_clear_all($cache_name, 'cache', TRUE);
-            
-            $url_api = 'http://sidih.colombiassh.org/sissh/api_portal.php?mod=contactos';
-            //$url_api = 'http://localhost/sissh/api_portal.php?mod='.$aaa;
-
-            $parse = parse_url($_SERVER['REQUEST_URI']);
-
-            if (!empty($_SERVER['QUERY_STRING'])) {
-                $url_api .= '&'.$_SERVER['QUERY_STRING'];
-            }
-
-            $json = drupal_http_request($url_api);
-
-            $json_data = drupal_json_decode($json->data);
-
-            cache_set($cache_name, $json_data, 'cache', time() + 86400);  // 1 day
-        }
-    }
-     */
-    
     $variables = $json_data;
     
     return theme('j2h', $variables);
 }
 
 /**
- * Implementa hook_theme().
+ * hook_theme().
  */
 function j2h_theme() {
 
@@ -161,7 +125,7 @@ function j2h_theme() {
 }
 
 /**
- * Implementa hook_block_info().
+ * hook_block_info().
  */
 function j2h_block_info() {
   $blocks['j2h'] = array(
@@ -170,7 +134,7 @@ function j2h_block_info() {
   return $blocks;
 }
 /**
- * Implementa hook_block_view().
+ * hook_block_view().
  */
 function j2h_block_view($delta = '') {
   switch ($delta) {
