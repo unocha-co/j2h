@@ -100,6 +100,8 @@ function j2h($mod_api='') {
     
     $json = drupal_http_request($url_api, array('data' => $url_api_params));
 
+    var_dump($json);
+
     if (!empty($json->error)) {
         $msg = t("The API: <a href='$url_api' target='_blank'>$url_api</a> shows this error: @error", array("@error" => $json->error));
         return "<div>".$msg."</div>";
