@@ -17,9 +17,9 @@ function j2h_menu() {
     
     $items['admin/config/content/j2h'] = array(
         'title' => 'Json 2 Human',
-        'description' => 'Configurar las opciones para j2h',
+        'description' => t('Json 2 Human Settings'),
         'page callback' => 'drupal_get_form',
-        'page arguments' => array('j2h_configuracion'),
+        'page arguments' => array('j2h_configuration'),
         'access arguments' => array('administer site configuration'),
         'file' => 'j2h.admin.inc',
     );
@@ -46,7 +46,6 @@ function _j2h_find_block_var($key, $block_vars) {
 function j2h($mod_api='') {
 
 
-    $en_cache = 0;
     $url_api_default = 'http://';
 
     $use_cache = (empty($_SERVER['QUERY_STRING'])) ? false : true;
@@ -129,7 +128,7 @@ function j2h_theme() {
  */
 function j2h_block_info() {
   $blocks['j2h'] = array(
-    'info' => 'Bloque para Json 2 Human',
+    'info' => 'Json 2 Human Block',
   );
   return $blocks;
 }
