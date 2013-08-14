@@ -89,22 +89,20 @@ function j2h($mod_api='') {
 
     }
 
-    $url_api_params = 'mod='.$mod_api;
+    $url_api .= '?mod='.$mod_api;
 
     // Filters
     $parse = parse_url($_SERVER['REQUEST_URI']);
 
     if (!empty($_SERVER['QUERY_STRING'])) {
-        $url_api_params .= '&'.$_SERVER['QUERY_STRING'];
+        $url_api .= '&'.$_SERVER['QUERY_STRING'];
     }
-    
-    $json = drupal_http_request($url_api, array('data' => $url_api_params));
 
-    var_dump($json);
+    $json = drupal_http_request($url_api);
 
     if (!empty($json->error)) {
         $msg = t("The API: <a href='$url_api' target='_blank'>$url_api</a> shows this error: @error", array("@error" => $json->error));
-        return "<div>".$msg."</div>";
+        return "<div></div>";
     }
 
     $json_data = drupal_json_decode($json->data);
