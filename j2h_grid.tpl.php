@@ -40,8 +40,8 @@
     ?>
     
     <div class="inline">
-        <input type="submit" id="search-contacts" name="" value="Buscar" class="form-submit">
-        <input type="button" id="reset" name="" value="Mostrar todos" class="form-submit">
+        <input type="submit" id="search-contacts" name="" value="<?php t('Search') ?>" class="form-submit">
+        <input type="button" id="reset" name="" value="<?php t("Reset") ?>" class="form-submit">
     </div>
 </div>
 </form>

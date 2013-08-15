@@ -15,15 +15,15 @@ function j2h_configuracion() {
     );
 
     $form['j2h_block_vars'] = array(
-        '#title' => 'Block variables per page',
-        '#description' => 'Specify block variables by using their paths. Enter one path per line. front is the front page, i.e: <front>:mod1_api, shelter:mod2_api',
+        '#title' => t('Block variables per page'),
+        '#description' => t('Specify block variables by using their paths. Enter one path per line. front is the front page, i.e: <front>:mod1_api, shelter:mod2_api'),
         '#type' => 'textarea',
         '#default_value' => variable_get('j2h_block_vars', ''),
     );
 
     $form['submit'] = array(
         '#type' => 'submit',
-        '#value' => 'Guardar configuración',
+        '#value' => t('Save configuration'),
     );
 
     $form['#submit'][] = 'j2h_configuracion_submit';  
@@ -48,7 +48,7 @@ function j2h_configuracion_submit($form, $form_state) {
     variable_set('j2h_api_url', $form_state['values']['j2h_api_url']);
     variable_set('j2h_block_vars', $form_state['values']['j2h_block_vars']);
 
-    drupal_set_message("Se han guardado las opciones de configuración.");
+    drupal_set_message(t("The configuration has been saved"));
 }
 
 ?>
